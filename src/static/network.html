@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>network Test Page</title>
+  <title>Network Management</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>network Management</h1>
+  <h1>Network Management</h1>
 
-  <h2>Add network</h2>
+  <h2>Add Network</h2>
   <form id="networkForm" autocomplete="off">
     <label>
       User Name:
@@ -25,7 +25,7 @@
   </form>
   <div id="responseMessage"></div>
 
-  <h2>network List</h2>
+  <h2>Network List</h2>
 
   <div id="paginationControls" aria-label="Pagination controls">
     <button id="prevPage" disabled>Previous</button>
@@ -44,7 +44,14 @@
 
   <table id="networkTable" aria-label="network list table">
     <thead>
-      <tr><th>ID</th><th>network Name</th><th>Email</th><th>Full Name</th><th>Create Date</th><th>Update Date</th></tr>
+      <tr>
+        <th>ID</th>
+        <th>User Name</th>
+        <th>Email</th>
+        <th>Full Name</th>
+        <th>Create Date</th>
+        <th>Update Date</th>
+      </tr>
     </thead>
     <tbody></tbody>
   </table>
@@ -60,7 +67,6 @@
 
     let currentPage = 1;
 
-    // Always read pageSize dynamically before load_network
     function getPageSize() {
       return Number(pageSizeSelect.value);
     }
@@ -73,15 +79,12 @@
 
       try {
         const res = await fetch(`${apiBase}?page=${page}&limit=${pageSize}`);
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const data = await res.json();
 
         tbody.innerHTML = '';
 
         if (data.length === 0 && page > 1) {
-          // No data on requested page - go back one page and reload
           currentPage = page - 1;
           updatePaginationButtons();
           load_network(currentPage);
@@ -113,23 +116,18 @@
 
     function updatePaginationButtons() {
       prevPageBtn.disabled = currentPage <= 1;
-      // Next button is always enabled as before
     }
 
-    // Prev button handler
     prevPageBtn.addEventListener('click', () => {
-      if (currentPage > 1) {
-        load_network(currentPage - 1);
-      }
+      if (currentPage > 1) load_network(currentPage - 1);
     });
 
-    // Next button handler
     nextPageBtn.addEventListener('click', () => {
       load_network(currentPage + 1);
     });
 
     pageSizeSelect.addEventListener('change', () => {
-      currentPage = 1;  // reset to first page on page size change
+      currentPage = 1;
       load_network(currentPage);
     });
 
@@ -149,18 +147,13 @@
       })
       .then(async res => {
         const contentType = res.headers.get('content-type') || '';
-        let data;
-        if (contentType.includes('application/json')) {
-          data = await res.json();
-        } else {
-          data = await res.text();
-        }
+        let data = contentType.includes('application/json') ? await res.json() : await res.text();
 
         if (res.status >= 400) {
           responseMessage.textContent = `Error ${res.status}: ` + (typeof data === 'string' ? data : JSON.stringify(data));
           responseMessage.classList.add('error');
         } else {
-          responseMessage.textContent = `Success ${res.status}: network added.`;
+          responseMessage.textContent = `Success ${res.status}: Network added.`;
           responseMessage.classList.add('success');
           document.getElementById('networkForm').reset();
           load_network(currentPage);
@@ -172,7 +165,6 @@
       });
     });
 
-    // Initial load
     load_network(currentPage);
   </script>
 </body>

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, Body
+from sqlalchemy import desc
 from sqlalchemy.orm import Session
 from framework.db import get_db
 from models.network import Network, NetworkCreate
@@ -38,7 +39,13 @@ def list_network(
     """
     try:
         offset = (page - 1) * limit
-        network_records = db.query(Network).offset(offset).limit(limit).all()
+        network_records = (
+            db.query(Network)
+            .order_by(desc(Network.update_date))  # sort descending
+            .offset(offset)
+            .limit(limit)
+            .all()
+        )
         return [serialize_sqlalchemy_obj(item) for item in network_records]
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")

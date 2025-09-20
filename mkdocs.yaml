@@ -1,0 +1,11 @@
+site_name: 'network'
+site_description: 'Main documentation for network'
+repo_url: https://github.com/jaysuzi5/network
+edit_uri: edit/main/docs
+
+plugins:
+  - techdocs-core
+
+nav:
+  - Overview:
+      - Getting started: 'docs/index.md'
